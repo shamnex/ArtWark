@@ -317,17 +317,27 @@ nav{
             //     border-radius:30px;
             //     padding:4px;
             // }
-            // &:hover{
-            //     &>img{
-            //         width:30px;
-            //         height:30px;
-            //     }
+            &:hover{
+                opacity:1;
+            }
             // }
         }
+
         &.left{
-            border-right: 2px solid #fff;
-            border-top:2px solid transparent;
-            border-bottom:2px solid transparent;
+            border-right: 30px solid rgba(225, 225, 225, 0.5);
+            border-top:25px solid transparent;
+            border-bottom:25px solid transparent;
+            &:hover{
+                border-right: 30px solid rgb(225, 225, 225);
+            }
+        }
+        &.right{
+            border-left: 30px solid rgba(225, 225, 225, 0.5);
+            border-top:25px solid transparent;
+            border-bottom:25px solid transparent;
+            &:hover{
+                border-left: 30px solid rgb(225, 225, 225);
+            }
         }
     }
 }

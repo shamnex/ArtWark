@@ -381,10 +381,28 @@ nav .mobile-nav ul li a {
   cursor: pointer;
 }
 
+.banner span.control:hover {
+  opacity: 1;
+}
+
 .banner span.left {
-  border-right: 2px solid #fff;
-  border-top: 2px solid transparent;
-  border-bottom: 2px solid transparent;
+  border-right: 30px solid rgba(225, 225, 225, 0.5);
+  border-top: 25px solid transparent;
+  border-bottom: 25px solid transparent;
+}
+
+.banner span.left:hover {
+  border-right: 30px solid #e1e1e1;
+}
+
+.banner span.right {
+  border-left: 30px solid rgba(225, 225, 225, 0.5);
+  border-top: 25px solid transparent;
+  border-bottom: 25px solid transparent;
+}
+
+.banner span.right:hover {
+  border-left: 30px solid #e1e1e1;
 }
 
 .mobile {

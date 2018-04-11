@@ -74,7 +74,7 @@ class Banner extends Component{
                 <span >
                     {this.state.qoute}
                 </span>
-                <span onClick={this.next} className="control left">
+                <span onClick={this.next} className="control right">
                     {/* <img src="../images/right.png" alt=""/> */}
                 </span>
             </div>
