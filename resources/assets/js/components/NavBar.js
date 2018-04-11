@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {SearchBar} from '../components';
 
-const NavBar =({cartCount=0, onSearch})=>{
+const NavBar =({cartCount=0, onSearch, onCancelSearch, search=""})=>{
         return(
             <nav>
                 <div className="mobile-nav">
@@ -25,7 +25,7 @@ const NavBar =({cartCount=0, onSearch})=>{
                     <li><a href="/Computer">Computer Art</a></li>
                 </ul>
                 <span>
-                    <SearchBar onSubmit={onSearch} />
+                    <SearchBar onSubmit={onSearch} onCancel={onCancelSearch} search={search}/>
                     <div className="cart-count">
                         <a href="/cart">
                             <img src="../images/cart.png" alt="" />

@@ -8,6 +8,8 @@ body{
 }
 
 nav{
+    position: sticky;
+    top: 0;
     //Flex
     display: flex;
     justify-content: space-between;
@@ -19,7 +21,7 @@ nav{
     background-color: $primary;
     color:white;
     //Dimensions
-    width: 100%;
+    // width: 100%;
     height: 40px;
     padding: 5px;
     margin: 0px;
@@ -40,28 +42,31 @@ nav{
     }
                
     .cart-count{
+    
         margin: 30px;
         width:inherit;
         img{
-            width:40px;
-            height: 40px;
+            width:30px;
+            height: 30px;
         }
         span{
+            
             display: inline-block;
-            width:10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
             padding: 5px;
-            border-radius: 15px;
+            border-radius: 8px;
             background-color:#f00;
             font-weight: bolder;
-            text-align: center; 
+            text-align:center;
+            line-height:10px;
             color: #fcd40a;
             font-size: 14px;
         }
         &:hover{
             img{
-                width:45px;
-                height: 45px;
+                width:35px;
+                height: 35px;
             }
             span{
                 background-color:#fcd40a;
@@ -290,6 +295,41 @@ nav{
     justify-content:center;
     align-items: center;
     flex-flow:column wrap;
+}
+
+.banner{
+    display:flex;
+    justify-content: space-between;
+    align-items:center;
+    height:300px;
+    padding:20px;
+    font-size:30px;
+    text-align: center;
+    color:#fff;
+    background: linear-gradient(45deg, black, $primary);
+    span{
+        cursor: pointer;
+        &.control{
+            // width:fit-content;
+            // height:fit-content;
+            // &>img{
+            //     background-color: rgba(225, 225, 225, 0.5);
+            //     border-radius:30px;
+            //     padding:4px;
+            // }
+            // &:hover{
+            //     &>img{
+            //         width:30px;
+            //         height:30px;
+            //     }
+            // }
+        }
+        &.left{
+            border-right: 2px solid #fff;
+            border-top:2px solid transparent;
+            border-bottom:2px solid transparent;
+        }
+    }
 }
 
 .mobile{

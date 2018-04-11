@@ -27,8 +27,8 @@ const ArtCard = ({item, onAddToCart, onBuy})=>{
                     <p>{item.price}</p>
                     <div className="actions">
                         <button onClick={addToCart}>Add to Cart</button>
-                        <button onClick={onBuy}>Buy Now</button>
-                     </div>
+                        <button onClick={buy}>Buy Now</button>
+                    </div>
                 </div>
             </div>
         </span>

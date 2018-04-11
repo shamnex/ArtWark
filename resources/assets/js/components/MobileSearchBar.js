@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
 import {SearchBar} from '../components'
 
-const MobileSearchBar = ({onSubmit})=>{
+const MobileSearchBar = ({onSubmit, onCancelSearch, search})=>{
     return(
         <div className="mobile">
-            <SearchBar onSubmit={onSubmit}/>
+            <SearchBar onSubmit={onSubmit} onCancel={onCancelSearch} search={search}/>
         </div>
     )
 }

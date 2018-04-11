@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import ReactDOM from "react-dom";
-import {NavBar, ArtDeck, SearchBar, MobileSearchBar} from './components';
+import {NavBar, ArtDeck, SearchBar, MobileSearchBar, Banner} from './components';
 
 
 class App extends Component{
@@ -13,16 +13,18 @@ class App extends Component{
 
                 ]
             },
-            allItems:[],
-            filteredItems:[],
-            filter:"all"
+            items:[],
+            filter:"all",
+            search:""
 
         }
         
      
-        this.onSubmitSearch = this.onSubmitSearch.bind(this);
+        this.setSearch = this.setSearch.bind(this);
         this.addToCart = this.addToCart.bind(this);
         this.filterItems = this.filterItems.bind(this);
+        this.setFilter = this.setFilter.bind(this);
+
     }
 
     componentWillMount(){
@@ -35,23 +37,14 @@ class App extends Component{
             {id:5, name:"Rocketed",  category: "abstract",description:"Computer Artwork. designed with class and style", price:"$4000"},    
         ];
 
-        this.setState({allItems:items, filteredItems:items})
+        this.setState({items})
     }
 
-    onSubmitSearch(data){
-        
-        const searchItems = this.state.allItems.filter(
-            item => 
-            item.name.toLowerCase().includes(data.toLowerCase())||
-            item.description.toLowerCase().includes(data.toLowerCase())||
-            item.category.toLowerCase().includes(data.toLowerCase())
-        )
-        console.log(Array(searchItems ))
-        this.setState({allItems:searchItems, filteredItems:searchItems, filter:'all'})
+    setSearch(search){
+        this.setState({search})
     }
     
     addToCart(data){
-        // alert(data)
         const state = Object.assign({}, ...this.state,{
             cart:{  
                 count: this.state.cart.count+1,
@@ -65,32 +58,61 @@ class App extends Component{
         this.setState(state)
     }
 
-    filterItems(data){
-        const filteredItems = this.state.allItems.filter(item=>item.category==data||data=="all");
+    filterItems(items=[], filter="", data=""){
+        const filteredItems = items.filter(item=>item.category==filter||filter=="all");
+        const searchItems = filteredItems.filter(
+            item => 
+            item.name.toLowerCase().includes(data.toLowerCase())||
+            item.description.toLowerCase().includes(data.toLowerCase())||
+            item.category.toLowerCase().includes(data.toLowerCase())||
+            item.price.toLowerCase().includes(data.toLowerCase())
+        );
+
+        // filteredItems.push(searchItems)
+        
         // this.items.map((item)=>{
         //     if(item.category===data||data==="all")
         //         return filteredItems.push(item)
         // }); 
-        console.log(filteredItems)
-        const state = Object.assign({}, ...this.state, {
-            filteredItems,
-            filter:data
-        })
-        this.setState(state)
+        // console.log(filteredItems)
+        // const state = Object.assign({}, ...this.state, {
+        //     filteredItems,
+        //     filter:data
+        // })
+        // this.setState(state)
+        console.log(searchItems)
+        return searchItems;
           
+    }
+
+    setFilter(filter){
+        this.setState({filter});
     }
 
     render(){
         return(
             <div>
-                <NavBar cartCount={this.state.cart.count} onSearch={this.onSubmitSearch}/>
-                <MobileSearchBar onSubmit={this.onSubmitSearch} />
+
+                <NavBar 
+                    cartCount={this.state.cart.count} 
+                    onSearch={this.setSearch}
+                    onCancelSearch={this.setSearch}
+                    search={this.state.search}
+                />
+                
+                <MobileSearchBar 
+                    onSubmit={this.setSearch} 
+                    onCancelSearch={this.setSearch} 
+                    search={this.state.search}
+                />
+                <Banner />
                 <ArtDeck 
-                    items={this.state.filteredItems} 
-                    filter={this.state.filter} 
-                    onFilterItems={this.filterItems} 
+                    items={this.filterItems(this.state.items, this.state.filter, this.state.search)} 
                     onAddItemToCart={this.addToCart} 
-                    onBuyItem={(data)=>alert(data +"bought")}
+                    onBuyItem={(item)=>alert(item +"bought")}
+                    search={this.state.search}
+                    filter={this.state.filter}
+                    onSetFilter={this.setFilter}
                 />
                 
             </div>
