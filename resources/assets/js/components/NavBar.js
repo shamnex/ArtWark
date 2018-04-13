@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import {SearchBar} from '../components';
+import {Link} from 'react-router-dom';
 
 const NavBar =({cartCount=0, onSearch, onCancelSearch, search=""})=>{
         return(
@@ -7,22 +8,24 @@ const NavBar =({cartCount=0, onSearch, onCancelSearch, search=""})=>{
                 <div className="mobile-nav">
                     <div className="menu"><img src="../images/menu.png" alt=""/></div>
                     <ul>
-                        <li><a href="/Penciled">Penciled Designs</a></li>
-                        <li><a href="/Paintings">Paintings</a></li>
-                        <li><a href="/Abstracts">Abstract Design</a></li>
-                        <li><a href="/Computer">Computer Art</a></li>
+                        <li><Link to="/">All</Link></li>
+                        <li><Link to="/penciled">Penciled Designs</Link></li>
+                        <li><Link to="/painting">Paintings</Link></li>
+                        <li><Link to="/abstract">Abstract Design</Link></li>
+                        <li><Link to="/computer">Computer Art</Link></li>
                     </ul>
                 </div>
                 <div> 
-                    <a href="/">
+                    <Link to="/">
                         <img src="../images/logo.png" alt="Logo"/>
-                    </a>  
+                    </Link>  
                 </div>
                 <ul>
-                    <li><a href="/Penciled">Penciled Designs</a></li>
-                    <li><a href="/Paintings">Paintings</a></li>
-                    <li><a href="/Abstracts">Abstract Design</a></li>
-                    <li><a href="/Computer">Computer Art</a></li>
+                    <li><Link to="/">All</Link></li>
+                    <li><Link to="/penciled">Penciled Designs</Link></li>
+                    <li><Link to="/painting">Paintings</Link></li>
+                    <li><Link to="/abstract">Abstract Design</Link></li>
+                    <li><Link to="/computer">Computer Art</Link></li>
                 </ul>
                 <span>
                     <SearchBar onSubmit={onSearch} onCancel={onCancelSearch} search={search}/>

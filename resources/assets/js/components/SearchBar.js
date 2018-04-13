@@ -14,7 +14,7 @@ const SearchBar =({onSubmit, onCancel, search}) => {
         onCancel("");
     }
     const CancelNode = ({search, onClick})=>{
-        console.log(":search:"+search)
+        // console.log(":search:"+search)
         if(search!=="")
             return(
                 <button onClick={onClick}>
