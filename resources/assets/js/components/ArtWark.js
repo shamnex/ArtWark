@@ -1,57 +1,155 @@
 import React, {Component} from "react";
-import ReactDOM from "react-dom";
-import {NavBar, ArtDeck, SearchBar, MobileSearchBar, Banner,Cart} from '../components';
+import {NavBar, ArtDeck, SearchBar, MobileSearchBar, Banner, Cart, CartTable, Footer} from '../components';
 import {BrowserRouter, Switch, Route} from 'react-router-dom';
+import axios from 'axios';
 
 
 class ArtWark extends Component{
+
     constructor(props){
+        const cart = JSON.parse(sessionStorage.getItem('cart'));
         super(props);
         this.state = {
-            cart:{
+            cart:cart?cart:{
                 count:0,
-                items:[
-
-                ]
+                items:[],
+                catalog:[],
+                amount:0
             },
             items:[],
             filter:"all",
-            search:""
+            search:{
+                status:false,
+                data:""
+            },
+            paginate:{
+                next:1,
+                total:1
+            }
+            
 
         }
         
-     
+        this.search = this.search.bind(this);
         this.setSearch = this.setSearch.bind(this);
+        this.cancelSearch = this.cancelSearch.bind(this);
+        
+        this.getCartItems = this.getCartItems.bind(this)
         this.addToCart = this.addToCart.bind(this);
+        this.updateCartItemQuantity = this.updateCartItemQuantity.bind(this)
+        this.removeCartItem =this.removeCartItem.bind(this)
+
         this.filterItems = this.filterItems.bind(this);
         this.setFilter = this.setFilter.bind(this);
-
+        
+        this.loadMore = this.loadMore.bind(this);
+        
     }
 
-    componentWillMount(){
-        const items = [
-            {id:1, name:"ArtWark", category:"penciled" ,description:"world class Artwork. designed with class and style", price:"$8000"},
-            {id:2, name:"Revert 1",  category:"painting", description:"Computer Artwork. designed with class and style", price:"$4000"},
-            {id:3, name:"Penciled 2.0",  category: "penciled",description:"Penciled Artwork. designed with greek and flex", price:"$3000"},    
-            {id:6, name:"ArtBook",  category: "computer",description:"world class Artwork. designed with class and style", price:"$8000"},
-            {id:4, name:"Penciled 3",  category: "penciled", description:"Penciled Artwork. designed with greek and flex", price:"$3000"},   
-            {id:5, name:"Rocketed",  category: "abstract",description:"Computer Artwork. designed with class and style", price:"$4000"},    
-        ];
-
-        this.setState({items})
+    componentDidMount(){        
+        this.requestItems();
     }
 
-    setSearch(search){
-        this.setState({search})
+    async requestItems(page=1, old = false){
+        let response = null;
+        if(old)
+            response = axios.get(`/api/product?page=${page}`).then((response)=>{
+                const items = response.data.data;            
+                const totalPages = response.data.last_page;
+                const state = Object.assign({}, ...this.state, {
+                    items:[...this.state.items,...items],
+                    paginate:{
+                        next:page+1,
+                        total:totalPages
+                    }
+                })
+                this.setState(state);
+            });
+        else
+            response = axios.get(`/api/product?page=${page}`).then((response)=>{
+                const items = response.data.data;            
+                const totalPages = response.data.last_page;
+                const state = Object.assign({}, ...this.state, {
+                    items:[...items],
+                    paginate:{
+                        next:page+1,
+                        total:totalPages
+                    }
+                })
+                this.setState(state);
+            });
+        return await response;
+    }
+
+    async loadMore(){
+        let response = null;
+        if(this.state.search.status)
+            response = this.search(this.state.search.data, this.state.paginate.next, true)
+        else
+            response = this.requestItems(this.state.paginate.next, true);
+
+        // console.log(`response${response}`)
+        return await response;
+        
+    }
+
+    // Search Methods
+    setSearch(status, data){
+        this.setState({search:{
+            status, 
+            data
+        }})
+    }
+
+    async search(search, page = 1, old = false ){ 
+        let response = null;
+            if(this.state.search.status && old){
+                response = axios.get(`/api/product/search/${search}?page=${page}`).then((response)=>{
+                    const items = response.data.data;            
+                    const totalPages = response.data.last_page;
+                    const state = Object.assign({}, ...this.state, {
+                        items:[...this.state.items, ...items],
+                        paginate:{
+                            next: page+1,
+                            total:totalPages
+                        }
+                    })
+                    this.setState(state);
+                    this.setSearch(true, search);
+            });
+            }else{
+                response = axios.get(`/api/product/search/${search}?page=${page}`).then((response)=>{
+                    const items = response.data.data;            
+                    const totalPages = response.data.last_page;
+                    const state = Object.assign({}, ...this.state, {
+                        items:[...items],
+                        paginate:{
+                            next: page+1,
+                            total:totalPages
+                        }
+                    })
+                    this.setState(state);
+                });
+                this.setSearch(true, search);
+            }
+            //console.log(response)
+            return await response;
     }
     
+    cancelSearch(){
+        this.setSearch(false, "");
+        this.requestItems()
+        
+    }
+
+    //Cart Methods
     addToCart(data){
         this.quantity = 1;
         this.exist = false;
         let state =null;
 
-        this.state.cart.items.map((item)=>{
-            if(item.itemId == data){
+        this.state.cart.catalog.map((item)=>{
+            if(item.id == data){
                 this.exist = true;
                 this.quantity = ++item.quantity;
             }
@@ -60,11 +158,12 @@ class ArtWark extends Component{
         if(!this.exist){
             state = Object.assign({}, ...this.state,{
                 cart:{  
+                    ...this.state.cart,                    
                     count: ++this.state.cart.count,
-                    items:[
-                        ...this.state.cart.items,
+                    catalog:[
+                        ...this.state.cart.catalog,
                         {
-                            itemId:data,
+                            id:data,
                             quantity: 1
                         }   
                     ]
@@ -74,11 +173,12 @@ class ArtWark extends Component{
         else{
             state = Object.assign({}, ...this.state, {
                 cart:{  
-                    count: this.state.cart.count+1,
-                    items:
-                        this.state.cart.items.map(item=>{
-                            if(item.itemId == data){
-                                return {itemId:data, quantity: this.quantity}
+                    ...this.state.cart,
+                    count: this.state.cart.count+1,                  
+                    catalog:
+                        this.state.cart.catalog.map(item=>{
+                            if(item.id == data){
+                                return {id:data, quantity: this.quantity}
                             }
                             return item
                         })
@@ -87,19 +187,125 @@ class ArtWark extends Component{
             })
         }
         this.setState(state)
+                
+    }
+    
+    async getCartItems(catalog){
+        let old = false;
+        let response = null;
+        let amount = 0;
+        
+        catalog.map(item=>{
+            const id = item.id;
+            const quantity = item.quantity;
+            if(old){
+                 response = axios.get(`api/product/${id}`).then(response=>{
+                    const total = response.data.price*quantity
+                    amount = amount + parseInt(total)
+                    const state = Object.assign({}, this.state,{
+                        cart:{
+                            ...this.state.cart,
+                            items:[...this.state.cart.items, {...response.data, quantity, total }],
+                            amount:amount
+                        }
+                    })
+                    this.setState(state)
+                })
+            }else{
+                response = axios.get(`api/product/${id}`).then(response=>{
+                    const total = response.data.price*quantity 
+                    amount = amount + parseInt(total)                                       
+                    const state = Object.assign({}, this.state,{
+                        cart:{
+                            ...this.state.cart,
+                            items:[{...response.data, quantity, total}],
+                            amount:amount
+                            
+                        }
+                    })
+                    this.setState(state)
+                })
+                old = true;
+            }
+            
+        })
+        return await response;
     }
 
+    updateCartItemQuantity(id, value, oldValue){
+        const count = this.state.cart.count-oldValue+value
+        let amount = 0;
+        
+        this.state.cart.items.map(item=>{
+            if(item.id==id){
+                amount = amount + (item.price*value)
+                return;
+            }
+            amount = amount + (item.total)
+            return;
+        })
+
+        const state = Object.assign({}, this.state, {
+            cart:{
+                ...this.state.cart,
+                count:count,
+                catalog:this.state.cart.catalog.map(item=>{
+                        if(item.id==id){
+                            item.quantity=value;
+                            item.total = item.quantity*item.price;
+                        }
+                        return item;
+                    }),
+                items: this.state.cart.items.map(item=>{
+                        if(item.id==id){
+                            item.quantity=value;
+                            item.total = item.quantity*item.price;
+                        }
+                        return item;
+                    }),
+                amount: amount
+            }
+
+        })
+
+        this.setState(state)
+        
+
+    }
+
+    removeCartItem(id, quantity){
+        const items = []
+        const catalog = []
+        const count = this.state.cart.count-quantity
+
+        this.state.cart.items.map(item=>{
+            if(item.id!=id){
+                items.push(item);
+            }
+        })
+        this.state.cart.catalog.map(item=>{
+            if(item.id!=id){
+                catalog.push(item);
+            }
+        })
+
+        const state = Object.assign({}, this.state, {
+            cart:{
+                count:count,
+                catalog:catalog,
+                items: items
+            }
+
+        })
+
+        this.setState(state)
+        
+    }
+
+    //FIlter Method
     filterItems(items=[], filter="", data=""){
         const filteredItems = items.filter(item=>item.category==filter||filter=="all");
-        const searchItems = filteredItems.filter(
-            item => 
-            item.name.toLowerCase().includes(data.toLowerCase())||
-            item.description.toLowerCase().includes(data.toLowerCase())||
-            item.category.toLowerCase().includes(data.toLowerCase())||
-            item.price.toLowerCase().includes(data.toLowerCase())
-        );
-
-        return searchItems;
+        return filteredItems;
           
     }
 
@@ -108,22 +314,23 @@ class ArtWark extends Component{
     }
 
     render(){
+        sessionStorage.setItem('cart', JSON.stringify(this.state.cart));
         return(
             <div>
 
                 <NavBar 
-                    cartCount={this.state.cart.count} 
-                    onSearch={this.setSearch}
-                    onCancelSearch={this.setSearch}
+                    cart={{count:this.state.cart.count, catalog:this.state.cart.catalog}} 
+                    onSearch={this.search}
+                    onCancelSearch={this.cancelSearch}
                     search={this.state.search}
+                    onGetCart={this.getCartItems}
                 />
-                
                 
                 <Banner />
 
                 <MobileSearchBar 
-                    onSubmit={this.setSearch} 
-                    onCancelSearch={this.setSearch} 
+                    onSubmit={this.search} 
+                    onCancelSearch={this.cancelSearch} 
                     search={this.state.search}
                 />
 
@@ -136,12 +343,13 @@ class ArtWark extends Component{
                         search={this.state.search}
                         filter={this.state.filter}
                         onSetFilter={this.setFilter}
+                        paginate={{next:this.state.paginate.next, total:this.state.paginate.total}}
+                        loadMore ={this.loadMore}
                         />                
                     }/>
+
                     <Route path="/:filter(penciled|abstract|computer|painting)" render={(path)=>{
                         const filter = path.match.params.filter;
-                        console.log(filter)
-
                         return(
                             <ArtDeck 
                             items={this.filterItems(this.state.items, filter, this.state.search)} 
@@ -150,12 +358,26 @@ class ArtWark extends Component{
                             search={this.state.search}
                             filter={filter}
                             onSetFilter={this.setFilter}
+                            paginate={{next:this.state.paginate.next, total:this.state.paginate.total}}
+                            loadMore ={this.loadMore}
                             />                
                         )
                         }
                     }/>
-                    <Route path="/cart" component={Cart} />
+                    
+                    <Route path="/cart" render={()=>
+                            <Cart 
+                            data={this.state.cart.items} 
+                            total = {this.state.cart.amount}
+                            onUpdateItemQuantity={this.updateCartItemQuantity} 
+                            onRemoveItem={this.removeCartItem} 
+                            />
+                        
+                    }
+                    />
+                    
                 </Switch>
+                <Footer />
             </div>
         )
     }

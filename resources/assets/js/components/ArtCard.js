@@ -19,15 +19,15 @@ const ArtCard = ({item, onAddToCart, onBuy})=>{
             </div>
             <div className="mask">
                 <div className="flex-column inherit-dim">
-                        <h3>
-                            {item.name} 
-                        </h3>  
+                    <h3>
+                        {item.name} 
+                    </h3>  
                           
                     <p>{item.description}</p>
-                    <p>{item.price}</p>
+                    <p>${item.price}</p>
                     <div className="actions">
                         <button onClick={addToCart}>Add to Cart</button>
-                        <button onClick={buy}>Buy Now</button>
+                        {/* <button onClick={buy}>Buy Now</button> */}
                     </div>
                 </div>
             </div>

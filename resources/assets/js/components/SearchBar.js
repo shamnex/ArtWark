@@ -11,11 +11,11 @@ const SearchBar =({onSubmit, onCancel, search}) => {
     }
     const cancel =(e)=>{
         e.preventDefault();
-        onCancel("");
+        onCancel();
     }
     const CancelNode = ({search, onClick})=>{
         // console.log(":search:"+search)
-        if(search!=="")
+        if(search.status)
             return(
                 <button onClick={onClick}>
                         <img src="../images/close.png" alt=""/>
